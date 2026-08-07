@@ -1,0 +1,89 @@
+{
+  "_source": "Macronimous Branding Kit v1 — extracted 2026-05-28",
+  "_note": "Hex values WITHOUT the leading # (so they can drop into docx/CSS configs that accept either form).",
+
+  "colors": {
+    "primary": {
+      "hex": "FFFFFF",
+      "name": "Primary (White)",
+      "use": "Backgrounds, negative space"
+    },
+    "text": {
+      "hex": "505050",
+      "name": "Secondary (Dark Gray)",
+      "use": "Body text, primary text color"
+    },
+    "textDark": {
+      "hex": "000000",
+      "name": "Secondary (Black)",
+      "use": "Headings, strong emphasis, high-contrast text"
+    },
+    "lightGray": {
+      "hex": "C3C4C7",
+      "name": "Secondary (Light Gray)",
+      "use": "Dividers, borders, subtle backgrounds, table headers"
+    },
+    "accent": {
+      "hex": "F18833",
+      "name": "Secondary (Orange)",
+      "use": "ONLY accent color. Use for: section underlines, key callouts, link color, logo accent, CTA emphasis, brand moments. Use sparingly — orange is the entire brand voice."
+    }
+  },
+
+  "semantic": {
+    "navy": "000000",
+    "blue": "F18833",
+    "lightBlue": "F8E4D2",
+    "paleBlue": "FDF3E9",
+    "white": "FFFFFF",
+    "text": "505050",
+    "textMid": "707070",
+    "textLight": "999999",
+    "green": "27AE60",
+    "greenBg": "EAFAF1",
+    "red": "C0392B",
+    "redBg": "FDEDEC",
+    "teal": "F18833",
+    "gold": "F18833",
+    "goldBg": "FDF3E9",
+    "gray": "F7F8FA",
+    "border": "C3C4C7",
+    "midGray": "C3C4C7",
+    "_note": "This semantic block is a drop-in 'brand' override for the seo-report-formatter skill and other doc generators that use the same key names. It maps Macronimous's grayscale-plus-orange palette into the generator's existing slot names. Orange replaces blue/teal/gold; black replaces navy. Green and red are kept for trend arrows (universal semantic meaning)."
+  },
+
+  "fonts": {
+    "primary": {
+      "family": "Open Sans, Arial, sans-serif",
+      "weights": [400, 500],
+      "use": "Body text, headings (use Calibri as docx fallback)"
+    },
+    "secondary": {
+      "family": "Montserrat Light, sans-serif",
+      "weights": [400],
+      "use": "Tagline, light accent text"
+    },
+    "docxFallback": "Calibri"
+  },
+
+  "logo": {
+    "path": "assets/logo.png",
+    "wordmark": "macronimous",
+    "tagline": "web · mobile · seo · solutions",
+    "aspectRatio": "5.3:1",
+    "recommendedSizes": {
+      "coverHeader": { "width": 254, "height": 48 },
+      "documentFooter": { "width": 170, "height": 32 },
+      "small": { "width": 120, "height": 23 }
+    }
+  },
+
+  "icons": {
+    "_note": "Tech-stack capability icons — use only when illustrating Macronimous's services/stack (proposals, capability slides). Do not use in standard SEO reports or correspondence.",
+    "html5": "assets/icons/icon-1.png",
+    "wordpress": "assets/icons/icon-2.png",
+    "joomla": "assets/icons/icon-3.png",
+    "drupal": "assets/icons/icon-4.png",
+    "ecommerce": "assets/icons/icon-5.png"
+  }
+}
