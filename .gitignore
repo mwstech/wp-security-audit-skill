@@ -1,0 +1,5 @@
+# Release build artifact (published on GitHub Releases, not tracked in source)
+wp-security-audit.zip
+
+# OS cruft
+.DS_Store
