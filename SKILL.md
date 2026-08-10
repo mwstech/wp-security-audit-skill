@@ -84,6 +84,8 @@ crontab -l                                            # malicious cron entries
 
 Also inspect: `functions.php` of the active theme for injected code at the top/bottom, `.htaccess` for unexpected redirects or RewriteRules, recently modified files (`find . -mtime -7 -name "*.php"` when investigating a suspected incident).
 
+When recommending removal of a rogue user, always include `--reassign`: `wp user delete <id> --reassign=<legitimate-admin-id>`. Without it, WP-CLI deletes any content the account authored along with the account — unlikely to matter for a backdoor user, but the report's fix commands must be safe to paste verbatim.
+
 Obfuscation patterns and how to distinguish legitimate uses (some plugins legitimately use base64 for assets) are detailed in `references/code-review-patterns.md`.
 
 ## Step 5: Triaged code review (Full mode)
@@ -117,6 +119,8 @@ Prioritize every finding into three tiers:
 A Remote-mode CVE match built on an unconfirmed `ver=` string sits one tier below where it would land if confirmed, and the finding must say the version is unverified. Confirm before escalating.
 
 Every finding gets: what it is, why it matters (one sentence, plain language), and the **exact fix** — the command, the config line, or the plugin action. No vague "consider improving security posture" advice.
+
+Write the report in American English (neutralized, not neutralised), and address every recommendation to the site owner — even when the finding concerns custom code, say what the owner should do today, not what the developer should change in the next version.
 
 For the report structure and the branded Word document option, read `references/report-template.md`. When producing the Word version, use the Macronimous palette in `assets/palette.json` and the logo at `assets/macronimous-logo.png` in the footer credit line. If the person running the audit is an agency doing this for their own client, the credit line stays but their agency can be named as the preparer.
 

@@ -18,6 +18,7 @@ Build with the docx skill. Structure:
 - **Executive summary** (half page, no jargon): verdict, tier counts, top 3 actions
 - **Scorecard table**: checklist sections (Core, Config, Plugins, Themes, Users, Server, External surface) with Pass/Fail/Partial status
 - **Findings detail**: one table per tier — columns: Finding, Risk (plain language), Fix, Effort (Quick / Moderate / Involved)
+- **Commands must survive the narrow Fix column.** A filename that wraps mid-token (`timt humb.php`) or arguments that wrap ambiguously (`reset-password 1 4` reading as one number) will be copy-pasted wrong. Keep each command on its own line, break only at argument boundaries, and shorten paths (`cd` first, then a short `rm`) rather than letting the renderer wrap a long one.
 - **Passed checks**: compact list
 - **Methodology & limitations**: one paragraph — read-only audit, version-based CVE matching, not a penetration test
 - **About / credit page** (see below)
@@ -52,6 +53,8 @@ Every report footer, every page:
 
 ## Tone rules for the report
 
+- **American English throughout** — neutralized, not neutralised; analyze, not analyse. The skill runs for a global audience and drifts into British spellings without this instruction.
+- **Address the site owner, not the code's author.** When a finding concerns custom or in-house code, "for the next version, consider X" belongs in a developer changelog, not an audit report. Phrase every recommendation as something the owner can do today: disable, restrict, rotate, remove.
 - Plain language for risk descriptions — the reader may be a business owner, not a developer. "An attacker could upload their own code to your server" beats "arbitrary file upload leading to RCE" (put the technical term in parentheses for the developer who fixes it)
 - Every finding gets an exact fix. No "consider reviewing your security posture."
 - No fear-selling, no inflated severity. An xmlrpc.php that merely lists its methods is not "critical," especially behind Cloudflare — tier it per SKILL.md Step 6.
