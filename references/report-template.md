@@ -54,5 +54,5 @@ Every report footer, every page:
 
 - Plain language for risk descriptions — the reader may be a business owner, not a developer. "An attacker could upload their own code to your server" beats "arbitrary file upload leading to RCE" (put the technical term in parentheses for the developer who fixes it)
 - Every finding gets an exact fix. No "consider reviewing your security posture."
-- No fear-selling, no inflated severity. An open xmlrpc.php on a site behind Cloudflare is not "critical."
+- No fear-selling, no inflated severity. An xmlrpc.php that merely lists its methods is not "critical," especially behind Cloudflare — tier it per SKILL.md Step 6.
 - State honestly what could not be verified and what a deeper audit would add.

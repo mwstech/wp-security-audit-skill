@@ -97,11 +97,11 @@ wp db query "SELECT option_name FROM $(wp db prefix)options WHERE option_value L
 
 ## 10. External surface (Remote mode covers this section + parts of 1, 3)
 
-- [ ] `xmlrpc.php` blocked or restricted (unless Jetpack/app requires it — then note the tradeoff)
+- [ ] `xmlrpc.php` blocked or restricted. If it responds 200, check which methods are exposed: `system.listMethods` alone is informational (Polish); `pingback.ping` or `system.multicall` present is Important. Restrict at the edge rather than blanket-disabling — Jetpack, the mobile app, and some integrations depend on it (see SKILL.md Step 6)
 - [ ] `/?author=1` does not redirect to a username-revealing URL
 - [ ] `/wp-json/wp/v2/users` returns 401/403 for unauthenticated requests
 - [ ] Directory listing disabled (`/wp-content/uploads/` returns 403, not a file index)
-- [ ] Security headers present: `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` or CSP `frame-ancestors`, `Referrer-Policy`
+- [ ] Security headers present: `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` or CSP `frame-ancestors`, `Referrer-Policy`, `Permissions-Policy`. For which of these actually matter and which to skip, follow the verdict in SKILL.md Step 6 rather than judging here — a strict CSP is Polish at most on a plugin-heavy site
 - [ ] WP version not disclosed in generator meta / RSS / readme.html
 - [ ] `/wp-login.php` and `/wp-admin/` behavior suggests protection (Cloudflare challenge, rate limiting) — passive observation only
 
