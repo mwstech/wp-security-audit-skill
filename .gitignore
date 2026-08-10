@@ -3,3 +3,6 @@ wp-security-audit.zip
 
 # OS cruft
 .DS_Store
+
+# Local Claude context (not for the public repo)
+CLAUDE.local.md
