@@ -112,3 +112,42 @@ wp db query "SELECT option_name FROM $(wp db prefix)options WHERE option_value L
 - [ ] Backup files themselves are not web-accessible (see §3)
 
 Not a vulnerability class, but the difference between a bad day and a lost business — include in every report.
+
+## 12. Access logs (Full mode · incident timeline — opt-in)
+
+Run this section only when triggered (a compromise indicator turned up, or the owner asks) and only after the briefing in SKILL.md. It is opt-in, not part of the routine sweep. All parsing is shell-side — return counts and a few sample lines, never raw log content.
+
+**No SSH? The log sweep does not require it.** It needs read access to the logs, not a shell. On cPanel hosts, Metrics → Raw Access downloads the same access log as a `.gz`; analyze the downloaded file exactly the same way (`zcat -f` / `zgrep`, or `gzcat` on macOS). This matters because a large share of shared-hosting owners — the people who most need this — don't have SSH enabled.
+
+### Finding the logs
+Written for someone who doesn't know where their logs live. Check in this order, and always sweep the rotated siblings (`access.log.1`, `access.log.*.gz`) with `zgrep` / `zcat -f`, not just the live file.
+
+| Host / stack | Access log location |
+|---|---|
+| nginx (default) | `/var/log/nginx/access.log`, rotated `access.log.1`, `access.log.*.gz` |
+| Apache (Debian/Ubuntu) | `/var/log/apache2/access.log*` |
+| Apache (RHEL/CentOS) | `/var/log/httpd/access_log*` |
+| cPanel (shared) | `~/access-logs/`, `~/logs/`, `/home/<user>/access-logs/<domain>` |
+| Plesk | `/var/www/vhosts/<domain>/logs/access_log*`, `/var/www/vhosts/system/<domain>/logs/` |
+| Hostinger (hPanel) | `~/logs/`, or hPanel → Website → Access Logs; raw retention is short (often ~1–3 days) |
+| SiteGround | `~/logs/<domain>/`, `~/access-logs/`, or Site Tools → Statistics → Access |
+| Cloudways | `/home/master/applications/<app>/logs/` (`apache_<app>.access.log`, `nginx_<app>.access.log`) |
+| Kinsta | MyKinsta → Logs, or `~/logs/access.log` over SSH |
+| WP Engine | User Portal → Access logs, or `~/.apache-access-logs/` over SSH |
+| LiteSpeed / OpenLiteSpeed | `/usr/local/lsws/logs/access.log`, or the vhost's configured path |
+
+If none are readable, that is itself a **Polish** finding — *"no outside-the-runtime request history available"* — paired with the enable instructions below.
+
+### Enabling logs when there are none
+- **cPanel:** Metrics → Raw Access → enable "Download logs as they are created" and "Archive logs" so they survive rotation.
+- **Hostinger:** hPanel shows recent access logs but keeps raw logs only briefly — for real retention, ship logs to an external collector or a CDN/WAF that stores them.
+- **Cloudflare (or any proxy) in front:** capture the real client IP at origin by adding `CF-Connecting-IP` (or `X-Forwarded-For`) to the log format, and/or use the provider's own retention (e.g. Cloudflare Logpush). Origin logs alone show only the proxy's IPs.
+- **nginx/Apache you control:** confirm `access_log` is on (not `off` in a server/location block) and that logrotate keeps enough history (`rotate 14` for two weeks).
+
+### Log sweep checklist
+- [ ] Log coverage measured and reported as "N days" — every finding in this section is bounded by it
+- [ ] Log format confirmed against a real sample line (field positions verified, not assumed)
+- [ ] Proxy/CDN checked — if the real client IP is absent, IP-based checks skipped and the report says why
+- [ ] Pivoted from each existing compromise indicator (filename / path / timestamp / IP): first hit, last hit, what else that source touched
+- [ ] Broad sweep only where useful: PHP paths not in inventory (allowlisting drop-ins, `mu-plugins`, cache PHP), POSTs to PHP under uploads, session isolation, login/xmlrpc volume, user-agent anomalies
+- [ ] Clean sweep reported as **inconclusive**, not Pass — especially over thin retention

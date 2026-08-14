@@ -88,6 +88,82 @@ When recommending removal of a rogue user, always include `--reassign`: `wp user
 
 Obfuscation patterns and how to distinguish legitimate uses (some plugins legitimately use base64 for assets) are detailed in `references/code-review-patterns.md`.
 
+If any check here turns up a compromise indicator — a rogue admin, PHP in uploads, a modified core file, an injected `.htaccess` — offer the Access Log Sweep below to date it. Logs can tell the owner *when* it started and what else the source touched. Offer; don't run it unprompted.
+
+## Access Log Sweep / Incident Timeline (Full mode · opt-in)
+
+Web server access logs are the fourth leg of the audit, alongside the filesystem (checksums), the database (direct queries), and the external surface (HTTP checks). They are the only leg that can **date** a breach rather than merely detect it: nginx and Apache write these logs, not PHP, so they sit outside the runtime a compromise controls. In earlier testing, a rogue-admin account was dated from database fields — a log line would have caught it the week it happened.
+
+**Do not overstate immutability.** "Malware can't alter what was already logged" holds on shared hosting, where the site's account user can't write to `/var/log/nginx/`. It does NOT hold if an attacker has root on a VPS, and cPanel-style `~/access-logs/` sits closer to the account. Logs are harder to tamper with than the filesystem, not impossible — say exactly that in the report. Overclaiming here repeats the sin the skill criticizes plugins for.
+
+**Full mode only.** Remote mode can't read logs — note it in the report the same way as other Full-only checks.
+
+**This is an incident-timeline tool, not a routine step.** It is opt-in, and it pivots from a known indicator wherever possible. Do not run it in every audit.
+
+### When to offer it
+1. The user asks directly — "check my logs", "when was I hacked", "can you tell when this started".
+2. The audit found a compromise indicator (rogue admin, PHP in uploads, modified core file, injected `.htaccess`). Offer, don't run: *"I found an admin account created outside your normal process. Your logs could tell you when it was created and what else that IP touched — if retention goes back far enough. Want me to look?"* Wait for a yes.
+3. The user suspects a hack or reports the site behaving oddly.
+
+### The briefing (present this, then stop and wait)
+Before reading a single log line, lay out the trade in plain language:
+- **What it can find** — *when* a break-in happened (not just that it did), requests to files that shouldn't exist, backdoor check-in patterns.
+- **What it costs** — the slowest part of the audit; a busy site means large logs.
+- **Shared-hosting caution** — heavy log scanning burns CPU and can trip per-account resource limits on budget hosts (Hostinger, SiteGround), which can throttle or suspend the site. Keep commands conservative, one file at a time.
+- **What it probably won't find** — most shared hosts keep only 1–3 days of raw logs. If the suspected break-in was months ago, the answer isn't there. Say this up front; for many users it makes the wait not worth it.
+- **Privacy** — logs contain visitor IP addresses, which are personal data under GDPR and similar laws. Offer masking (default on) for report output. Be honest about what masking does: full IPs are still read into the session to do the correlation; only the report output is masked. Don't call this anonymization.
+
+Then offer three choices: **run it**, **skip it**, or **check retention first**. The retention check is one cheap command (below) that returns how many days of logs exist — often enough to decide. If retention is 2 days and the suspected compromise is older, stop there and save an hour.
+
+### Pre-flight (before any analysis)
+1. **Locate the logs.** Paths vary by host — see the table in `references/audit-checklist.md` §12.
+2. **Measure retention and volume.** Oldest and newest entry, total size across rotated files. Report as *"log coverage: N days."*
+3. **Detect the log format.** Combined vs common vs custom — verify field positions against a real sample line. Never assume column order.
+4. **Check whether the logged IPs are real — decide this from the log, not from DNS.** A site can sit behind Cloudflare/Sucuri and *still* log real client IPs, because the host restores them (`mod_remoteip`, `CF-Connecting-IP`, `X-Forwarded-For`). So don't reason "the site has a CDN, therefore skip IP checks." Look at the actual field-1 IPs: if they're dominated by CDN ranges (Cloudflare `104.16/12`, `172.64/13`, `162.158/15`, `173.245.48/20`, and similar), the real client is hidden — run **file-path checks only**, and never report a CDN edge IP as an attacker. If they're diverse real addresses, the per-IP checks are valid even though a CDN is in front. PHP responses are never cached, so the file-path checks stay valid either way.
+5. **If no logs are readable, that is itself a finding** — *"no outside-the-runtime request history available"* — with the per-host enable instructions in §12. Tier: **Polish**.
+
+Retention / volume check (cheap — run this first if the user picks "check retention"):
+```bash
+LOG=/path/to/access.log          # set from the §12 table
+zcat -f "$LOG"* | head -1         # oldest line (includes rotated .gz siblings)
+zcat -f "$LOG" | tail -1          # newest line
+du -ch "$LOG"* | tail -1          # total size across rotations
+```
+
+### Primary mode — pivot from a known indicator
+Given a filename, path, timestamp, or IP from an existing finding, reconstruct the session:
+- Every request to that file — timestamps, methods, response codes, source
+- **First and last occurrence** — this is the breach date
+- What else the same source touched in the same window
+- Whether it's still being hit
+
+```bash
+# pivot on a known backdoor filename — counts + a few sample lines only, never the raw log
+zgrep -h "evil-backdoor.php" "$LOG"* | awk '{print $1}' | sort | uniq -c | sort -rn | head
+zgrep -h "evil-backdoor.php" "$LOG"* | sort | head -3    # first hits (breach start)
+zgrep -h "evil-backdoor.php" "$LOG"* | sort | tail -3    # last hits (still active?)
+```
+Fast, precise, bounded. This is the default whenever a compromise indicator exists.
+
+### Secondary mode — broad sweep
+Slower and noisier; use only when there's no single indicator to pivot from. Priority order:
+1. **Requests to PHP files not in the inventory — gated on the response code, not the path.** Cross-reference requested `.php` paths against the plugin/theme/core inventory from Step 1. **The status code is the discriminator.** Every WordPress site is hit constantly by scanners probing for known backdoor filenames (`wp_filemanager.php`, `radio.php`, `*_hello_world.php`, and hundreds more); those requests return `403`/`404`/`406`/`410`/`429` because the file isn't there or the WAF blocked them, and they are **noise, not findings** — at most note "the host is blocking backdoor scans, working as intended." The real signal is a **2xx (or a 500, which can mean the code ran and errored) to a PHP file not in inventory** — that is a headline finding. Even the 2xx set false-positives without care, so **allowlist** legitimate files that live outside a naive inventory: drop-ins (`advanced-cache.php`, `object-cache.php`, `db.php`), `mu-plugins`, and cache-plugin generated PHP. Also flag a **2xx to a PHP file that no longer exists on disk** — a webshell since deleted or self-deleting, which a filesystem scan can't find.
+2. **POSTs to PHP inside `wp-content/uploads/`.** Near-certain compromise.
+3. **Session isolation** — one IP, one PHP file, no referrer, no other page views. Classic backdoor check-in. *(Requires real client IPs — skip if proxied.)*
+4. **`wp-login.php` / `xmlrpc.php` volume per IP.** Report counts only; block nothing. *(Requires real client IPs — skip if proxied.)*
+5. **User-agent anomalies on PHP hits** — empty, `curl`, or `python` user-agents POSTing to PHP.
+
+### Design constraints (apply to everything above)
+- **Read-only, always.** Parse and report. Never rotate, truncate, delete, or block.
+- **Shell-side parsing only.** A busy site's access log is hundreds of MB. Do all filtering and aggregation in `awk`/`grep`/`sort | uniq -c` and return counts plus a handful of sample lines. **Never read raw log content into the session** — it destroys context and adds an hour to an already-slow audit. One file at a time, hard caps on output, no unbounded scans.
+- **State the limits out loud.** Report *"log coverage: N days — findings below are bounded by this."* An empty sweep over 2 days proves almost nothing, and the report must say so.
+- **A clean sweep is INCONCLUSIVE, never PASS.** Same overclaiming discipline as the rest of the skill.
+
+Tiering:
+- Confirmed webshell hit, or a 200 to a PHP file not in inventory → **Critical**
+- Brute-force volume, or a session-isolation pattern → **Important**
+- Thin or absent log retention → **Polish** (recommend enabling/extending)
+
 ## Step 5: Triaged code review (Full mode)
 
 *Remote mode can't read plugin source; skip to Step 6.*

@@ -23,6 +23,17 @@ Build with the docx skill. Structure:
 - **Methodology & limitations**: one paragraph — read-only audit, version-based CVE matching, not a penetration test
 - **About / credit page** (see below)
 
+## Access-log / incident-timeline findings (only when the log sweep ran)
+
+The access-log sweep is opt-in and Full-mode only (SKILL.md → Access Log Sweep). Include this section only when it actually ran. When it did:
+
+- **Open with "Log coverage: N days,"** and state that every finding below is bounded by it. A clean sweep over 2 days of logs proves very little — say so rather than implying the site's whole history was searched.
+- **Report a clean sweep as inconclusive, not Pass.** Write "No compromise indicators in the available logs," never "logs clean." Same overclaiming discipline as the rest of the skill — a clean short window is not a bill of health.
+- **When no logs were readable, record the variant finding:** "No outside-the-runtime request history available" (Polish tier), with the enable-logs pointer from `references/audit-checklist.md` §12.
+- **Mask IP addresses in the output by default.** Note that masking covers the report only, not what was read into the session to do the correlation — do not call it anonymization.
+- **If the site is proxied (Cloudflare/Sucuri) and real client IPs were unavailable,** say which checks were skipped and why: the origin logs showed the CDN's IPs, not visitors'. Don't report an edge-node IP as an attacker.
+- **Date the breach when a pivot found it:** give first-seen and last-seen timestamps for the indicator, and note whether it's still being hit.
+
 ## Branding
 
 Grayscale + orange palette (full values in `assets/palette.json`):
