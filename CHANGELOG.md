@@ -2,7 +2,7 @@
 
 Notable changes to the WP Security Audit skill. Versions track the GitHub releases.
 
-## [Unreleased]
+## [1.1] - 2026-08-14
 
 ### Added
 - **Access Log Sweep / Incident Timeline** (Full mode, opt-in). Pivots from a known
