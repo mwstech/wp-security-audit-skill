@@ -9,6 +9,8 @@ A free, shareable skill by **Macronimous Web Solutions** (macronimous.com) — a
 
 Audits a WordPress site's real attack surface. WordPress core is rarely the problem; plugins, themes, configuration, and existing compromises are. This skill focuses effort where breaches actually happen.
 
+**Authorization comes first.** Before running any check, in either mode, ask the user to confirm that they own the site or are authorized by its owner to audit it. If they say no, or won't confirm, decline the audit and don't run any checks against the site.
+
 ## Step 0: Determine the audit mode
 
 Ask (or infer from context) which access is available:
