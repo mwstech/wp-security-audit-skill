@@ -17,3 +17,7 @@ wp-security-audit/
 Build release zips with `./build-release.sh`, which assembles that layout from `skills/wp-security-audit/`. Don't zip by hand.
 
 **Consequence.** There are two READMEs. The root `README.md` is the plugin directory's listing text, so it has to name every external service the skill contacts and what it sends. `skills/wp-security-audit/README.md` is the first-time-user walkthrough that ships inside the zip. If the skill ever starts contacting a new service, update the table in the root README in the same change.
+
+## 2026-10-06: Icon inside .claude-plugin/; contributor rules moved to .claude/
+
+**Decision.** The directory icon lives at `.claude-plugin/icon.png` (1024x1024 PNG of the shield mark from the tool page). This relaxes the earlier rule that only the manifest goes inside `.claude-plugin/`, because that path is the portal's default and passes strict validation with no warnings. The contributor rules file moved from `CLAUDE.md` at the root to `.claude/CLAUDE.md`: the validator warns about a root CLAUDE.md in a plugin, and Claude Code still reads it from `.claude/`.
