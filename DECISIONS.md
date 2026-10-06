@@ -20,4 +20,6 @@ Build release zips with `./build-release.sh`, which assembles that layout from `
 
 ## 2026-10-06: Icon inside .claude-plugin/; contributor rules moved to .claude/
 
-**Decision.** The directory icon lives at `.claude-plugin/icon.png` (1024x1024 PNG of the shield mark from the tool page). This relaxes the earlier rule that only the manifest goes inside `.claude-plugin/`, because that path is the portal's default and passes strict validation with no warnings. The contributor rules file moved from `CLAUDE.md` at the root to `.claude/CLAUDE.md`: the validator warns about a root CLAUDE.md in a plugin, and Claude Code still reads it from `.claude/`.
+**Decision.** The directory icon (a 1024x1024 image of the shield mark from the tool page) lives inside `.claude-plugin/`. This relaxes the earlier rule that only the manifest goes inside `.claude-plugin/`, because that path is the portal's default and passes strict validation with no warnings. The contributor rules file moved from `CLAUDE.md` at the root to `.claude/CLAUDE.md`: the validator warns about a root CLAUDE.md in a plugin, and Claude Code still reads it from `.claude/`.
+
+**Rule that follows.** Don't write out the file path of an image (icon, logo) in docs or notes. The directory's scanner treats any text that names an image file as something that might run it, and adds a review finding. Name an image's path only where the skill genuinely needs it, as SKILL.md does for the report logo.
