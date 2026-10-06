@@ -2,7 +2,7 @@
 
 Notable changes to the WP Security Audit skill. Versions track the GitHub releases.
 
-## [1.2.0] - Unreleased
+## [1.2.0] - 2026-10-06
 
 ### Added
 - Packaged as a Claude plugin for submission to Anthropic's plugin directory. The manifest
@@ -12,6 +12,10 @@ Notable changes to the WP Security Audit skill. Versions track the GitHub releas
   and declines if they say no.
 - Root `README.md` written as the directory listing: both modes, every external service
   the skill contacts and what it sends, and a Privacy section.
+
+### Fixed
+- The walkthrough's Claude Code install command now downloads the latest release
+  instead of a link pinned to v1.0.
 
 ## [1.1] - 2026-08-14
 
