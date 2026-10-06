@@ -1,5 +1,6 @@
 {
   "name": "wp-security-audit",
+  "displayName": "WP Security Audit",
   "version": "1.2.0",
   "description": "Read-only security audit of a live WordPress site, run from outside WordPress: plugin and theme CVE cross-check, core checksum verification, wp-config and permission review, malware and rogue-admin detection, and an optional access-log timeline. Produces a Critical / Important / Polish report with the exact fix for each finding.",
   "author": {
@@ -8,5 +9,18 @@
   },
   "homepage": "https://www.macronimous.com/free-tools/wordpress-security-audit-claude-skill/",
   "repository": "https://github.com/mwstech/wp-security-audit-skill",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": [
+    "wordpress",
+    "security",
+    "audit",
+    "malware",
+    "vulnerability",
+    "cve",
+    "wp-cli"
+  ],
+  "documentationUrl": "https://github.com/mwstech/wp-security-audit-skill/blob/main/skills/wp-security-audit/README.md",
+  "supportUrl": "https://github.com/mwstech/wp-security-audit-skill/issues",
+  "privacyPolicyUrl": "https://github.com/mwstech/wp-security-audit-skill#privacy",
+  "termsOfServiceUrl": "https://github.com/mwstech/wp-security-audit-skill/blob/main/LICENSE"
 }
