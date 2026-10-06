@@ -55,7 +55,7 @@ Open Terminal (Mac) or your command line (Windows/Linux) and paste these lines o
 ```bash
 mkdir -p ~/.claude/skills
 cd ~/.claude/skills
-curl -L -o wp.zip https://github.com/mwstech/wp-security-audit-skill/releases/download/v1.0/wp-security-audit.zip
+curl -L -o wp.zip https://github.com/mwstech/wp-security-audit-skill/releases/latest/download/wp-security-audit.zip
 unzip wp.zip
 rm wp.zip
 ```
